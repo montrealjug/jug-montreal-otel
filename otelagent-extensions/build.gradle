@@ -1,0 +1,63 @@
+plugins {
+  id "java"
+  id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+group 'com.jug'
+version '0.0.1-SNAPSHOT'
+
+ext {
+  versions = [
+    opentelemetryJavaagent: "1.21.0",
+  ]
+
+  deps = [
+    autoservice: dependencies.create(group: 'com.google.auto.service', name: 'auto-service', version: '1.0.1')
+  ]
+}
+
+repositories {
+  mavenCentral()
+}
+
+configurations {
+  otel
+}
+
+dependencies {
+  compileOnly("io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:1.21.0")
+  compileOnly("io.opentelemetry.javaagent:opentelemetry-javaagent-extension-api:1.21.0-alpha")
+
+  //Provides @AutoService annotation that makes registration of our SPI implementations much easier
+  compileOnly deps.autoservice
+  annotationProcessor deps.autoservice
+
+  otel("io.opentelemetry.javaagent:opentelemetry-javaagent:${versions.opentelemetryJavaagent}")
+}
+
+task extendedAgent(type: Jar) {
+  dependsOn(configurations.otel)
+  archiveFileName = "opentelemetry-javaagent.jar"
+  from zipTree(configurations.otel.singleFile)
+  from(tasks.shadowJar.archiveFile) {
+    into "extensions"
+  }
+
+  //Preserve MANIFEST.MF file from the upstream javaagent
+  doFirst {
+    manifest.from(
+      zipTree(configurations.otel.singleFile).matching {
+        include 'META-INF/MANIFEST.MF'
+      }.singleFile
+    )
+  }
+}
+
+
+tasks {
+  compileJava {
+    options.release.set(17)
+  }
+
+  assemble.dependsOn(shadowJar)
+}

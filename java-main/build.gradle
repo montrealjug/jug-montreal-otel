@@ -1,0 +1,28 @@
+plugins {
+    id 'application' 
+}
+
+group = 'com.jug'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral() 
+}
+
+dependencies {
+    implementation 'io.opentelemetry:opentelemetry-api:1.21.0'
+}
+
+application {
+    mainClass = 'com.jug.App'
+}
+
+run {
+    jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
+}
+
+tasks.named('test') {
+    useJUnitPlatform() 
+}
+

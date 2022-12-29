@@ -1,0 +1,62 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.1'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.jug'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	otelagent
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+  	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//implementation 'org.springframework.boot:spring-boot-starter-task'
+    
+	// micrometer
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	
+	// opentelemetry bridge
+	//implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+	//implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+
+	// opentelemetry API + annotation
+	implementation 'io.opentelemetry:opentelemetry-api:1.20.1'
+	implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:1.21.0'
+
+	// opentelemetry SDK
+    //implementation 'io.opentelemetry:opentelemetry-sdk:1.20.1'
+    //implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.20.1'
+
+	// opentelemtry autoconfigured
+	//implementation 'io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.21.0-alpha'
+
+  	runtimeOnly 'com.h2database:h2'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	otelagent 'io.opentelemetry.javaagent:opentelemetry-javaagent:1.21.0'
+}
+
+bootRun {
+    //jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
+	jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
+
+	//environment OTEL_JAVAAGENT_EXTENSIONS: "../otelagent-extensions/build/libs/otelagent-extensions-0.0.1-SNAPSHOT.jar"
+    environment OTEL_SERVICE_NAME: "java-worker"
+	// default value
+	environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

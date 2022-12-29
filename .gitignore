@@ -1,0 +1,6 @@
+**/.gradle
+**/.vscode
+*.code-workspace
+**/bin
+**/build
+**/gradle.properties

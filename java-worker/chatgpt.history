@@ -1,0 +1,30 @@
+I would like a Java app with a REST endpoint
+And with using Spring ?
+I need to init and do an insert in H2 database with this application.
+Can you express the dependencies with the gradle format ?
+
+I want to use a record for the entity
+"javax.persistence" doesn't resolve. do i need another dependency ?
+Are you sure jpa is compatible with record ?
+
+=> impossible directly, see https://vladmihalcea.com/java-records-jpa-hibernate/ or https://stackoverflow.com/a/70601646
+
+I got the following error  "Not a managed type: class com.jug.worker.model.Person"
+I have to use jakarta package instead of javax
+
+I want to pass the firstname as a parameter in the endpoint method
+
+I want to add a micrometer registry to this application
+
+In Person entity, I need to have a uniq value for firstname
+I want to return a specific http code on exception when calling sayhello()
+
+I want to do a periodic sql request in my application
+It is corrent, but I want to use my repository instead of a jdbctemplate
+I want the task to be executed every 5 seconds
+how to enable scheduling in spring boot ?
+I don't find the "spring-boot-starter-task" dependency. are you sure it exists ?
+
+I want to add a log to my spring application.
+
+How to do a get request in java 17 ?
