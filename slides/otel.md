@@ -50,7 +50,7 @@ Second most important project in CNCF (after Kubernetes)
 
 # What it is
 
-Signals :
+A tool to collect and dispatch some signals:
 * Tracing (propagation)
 * Metrics
 * Logs (later)
@@ -59,13 +59,15 @@ Signals :
 
 A tool to store and visualize traces, metrics or logs
 
+You have to use another tool like Jaegger, Prometheus, ...
+
 ---
 
 # What does it provide
 
 * Specification
 * API and SDK in many languages (Java, Python, Rust, ...)
-* SDK configuration is using centralized configuration variables
+* SDK configuration with centralized configuration variables
 * Collector : aka OtelCol, written in go, can have an authenticator
 * Protocol : aka OTLP, over HTTP or gRPC or JSON Protobuff (experimental)
 
@@ -91,14 +93,33 @@ https://opentelemetry.io/docs/concepts/glossary/
 
 # Baggage
 
-Caution with visiblity as it is part of the context propagation
-Not a span attribute, so it must be copied
+A baggage is an attribute which is propagated between spans
+
+It is a public information, so caution with its visibility
+
+<!-- insister sur la différence avec les spans attributes -->
+
+---
+
+# How context is propagated ?
+
+By default,
+* W3C Trace Context (https://www.w3.org/TR/trace-context/) -> published in november 2021
+* W3C Baggage (https://www.w3.org/TR/baggage/) -> working draft since september 2022
+
+Alternatives are possible
 
 ---
 
 ![bg 80%](https://opentelemetry.io/img/otel_diagram.png)
 
 ---
+
+---
+
+# Collector
+
+Reference implementation written in Go
 
 ![bg 80%](https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/Otel_Collector.svg)
 
@@ -116,9 +137,9 @@ https://github.com/open-telemetry/opentelemetry-specification/pull/2104
 SDK still under active dev, but Meter is ready in java-sdk
 
 
-
 Logs: draft/experimental
-Integration with existing framework first, then logging API later
+Current focus is integration with existing framework
+An API will come later
 
 ---
 
@@ -144,13 +165,6 @@ From micrometer :
 
 It is moving fast. So keep a look at new features or configuration params regularly.
 
----
-
-# How context is propagated ?
-
-By default,
-* W3C Trace Context (https://www.w3.org/TR/trace-context/) -> published in november 2021
-* W3C Baggage (https://www.w3.org/TR/baggage/) -> working draft since september 2022
 
 ---
 
@@ -169,12 +183,26 @@ Depends on API only (unless specific needs)
 
 ---
 
+# Storage and viewer setup
+
+<!--  TODO
+faire un diagramme avec le collecteur, PG et Grafana en mentionnant les protocoles utilisés
+-->
+
+<!-- présentation du setup 
+* conf collector en mode log + export
+* extension PG pour le stockage
+* Grafana pour la visualisation
+-->
+
+---
+
 # Java agent
 
 Still in beta but usable
-Maintened mostly by trask, the developer of Glowroot
+Maintained mostly by trask, the developer of Glowroot
 
-Alternative ?
+Agent alternative ?
 
 Add java-sdk dependency and initialize AutoConfigure
 https://github.com/open-telemetry/opentelemetry-java-docs/blob/main/autoconfigure/src/main/java/io/opentelemetry/example/autoconfigure/AutoConfigExample.java
@@ -197,7 +225,7 @@ https://spring.io/blog/2022/10/12/observability-with-spring-boot-3
 
 # Java agent extensions
 
-Can tune the agent with external jars
+Agent is tunable with external jars
 
 <!-- Demo with otelagent-extensions project -->
 
@@ -207,3 +235,4 @@ Can tune the agent with external jars
 
 8-parts guide about OTEL: https://www.apmdigest.com/opentelemetry-1
 test with traces: https://github.com/kubeshop/tracetest
+Promscale (postgres extension): https://docs.timescale.com/promscale/latest/

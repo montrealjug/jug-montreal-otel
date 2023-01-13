@@ -8,6 +8,9 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 @Configuration(proxyBeanMethods = false)
 public class MicrometerBinderConfiguration {
 
+    /**
+     * A micrometer Binder which returns the number of persons in database.
+     */
     @Bean
     public MeterBinder numberOfPersons(PersonRepository repository) {
         return (registry) -> Gauge.builder("number.of.persons", repository::count).register(registry);

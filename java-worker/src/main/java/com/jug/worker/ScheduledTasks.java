@@ -16,10 +16,14 @@ public class ScheduledTasks {
     this.personRepository = personRepository;
   }
 
+  /**
+   * Do a request at fixed interval to count the number of registered persons.
+   */
   @Scheduled(fixedRate = 5000)
   public void executeSql() {
     if (personRepository.countByFirstName("jugmontreal") > 0) {
-        //LOGGER.info("jugmontreal person found");
+      // to have a log in the task span  
+      LOGGER.info("jugmontreal person found");
     }
   }
 }
