@@ -5,6 +5,7 @@ plugins {
 
 group 'com.jug'
 version '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
 
 ext {
   versions = [
@@ -53,11 +54,6 @@ task extendedAgent(type: Jar) {
   }
 }
 
-
 tasks {
-  compileJava {
-    options.release.set(17)
-  }
-
   assemble.dependsOn(shadowJar)
 }
