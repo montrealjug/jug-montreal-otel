@@ -20,6 +20,8 @@ application {
 
 run {
     jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
+    environment OTEL_SERVICE_NAME: "java-main"
+    environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
 }
 
 tasks.named('test') {

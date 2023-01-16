@@ -48,15 +48,16 @@ dependencies {
 }
 
 bootRun {
-    jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
+    //jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
 	
 	// agent extension configuration
-	environment OTEL_JAVAAGENT_EXTENSIONS: "../otelagent-extensions/build/libs/otelagent-extensions-0.0.1-SNAPSHOT.jar"
-    //jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
+	//environment OTEL_JAVAAGENT_EXTENSIONS: "../otelagent-extensions/build/libs/otelagent-extensions-0.0.1-SNAPSHOT.jar"
+    jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
 
 	environment OTEL_SERVICE_NAME: "java-worker"
 	// default value
 	environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
+	environment OTEL_INSTRUMENTATION_SPRING_DATA_ENABLED: "false"
 }
 
 tasks.named('test') {

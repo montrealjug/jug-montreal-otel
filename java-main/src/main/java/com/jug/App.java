@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.LongHistogram;
+import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanBuilder;
 import io.opentelemetry.api.trace.SpanContext;
@@ -49,6 +51,8 @@ public class App {
     private final List<String> names = new ArrayList<>();
     private final Tracer tracer =
         GlobalOpenTelemetry.getTracer("java-main", "0.0.1");
+    private final Meter meter =
+        GlobalOpenTelemetry.getMeter("java-worker");
     private final ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
     private final static Pattern UGLY_JSON_PATTERN = Pattern.compile("\"id\":(\\d+)");
 
@@ -92,7 +96,10 @@ public class App {
     private String localNameGenerator() {
         Span span = tracer.spanBuilder("localNameGenerator").startSpan();
         try (Scope ss = span.makeCurrent()) {
-            return names.get(random.nextInt(names.size()));
+            int randomValue = random.nextInt(names.size());
+            LongHistogram histogram = meter.histogramBuilder("jug_local_name_generator").setUnit("idx").ofLongs().build();
+            histogram.record(randomValue);
+            return names.get(randomValue);
         } finally {
             span.end();
         }

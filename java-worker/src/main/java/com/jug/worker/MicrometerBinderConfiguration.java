@@ -13,7 +13,8 @@ public class MicrometerBinderConfiguration {
      */
     @Bean
     public MeterBinder numberOfPersons(PersonRepository repository) {
-        return (registry) -> Gauge.builder("number.of.persons", repository::count).register(registry);
+        // TOSHOW: micrometer gauge
+        return (registry) -> Gauge.builder("jug.number.of.persons", repository::count).register(registry);
     }
 
 }

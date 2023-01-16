@@ -22,7 +22,7 @@ public class ScheduledTasks {
   @Scheduled(fixedRate = 5000)
   public void executeSql() {
     if (personRepository.countByFirstName("jugmontreal") > 0) {
-      // to have a log in the task span  
+      // to have a log within a span
       LOGGER.info("jugmontreal person found");
     }
   }

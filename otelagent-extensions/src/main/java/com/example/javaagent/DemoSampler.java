@@ -36,14 +36,15 @@ public class DemoSampler implements Sampler {
       
     if (spanKind == SpanKind.INTERNAL && name.equals("ScheduledTasks.executeSql")) {
       return SamplingResult.drop();
-    } else {
-      // drop this span if parent hasn't been sampled
-      SpanContext parentSpanContext = Span.fromContext(parentContext).getSpanContext();
-      if (parentSpanContext.isValid() && !parentSpanContext.isSampled()) {
-        return SamplingResult.drop();
-      }
-      return SamplingResult.recordAndSample();
     }
+
+    // drop this span if parent hasn't been sampled
+    SpanContext parentSpanContext = Span.fromContext(parentContext).getSpanContext();
+    if (parentSpanContext.isValid() && !parentSpanContext.isSampled()) {
+      return SamplingResult.drop();
+    }
+    
+    return SamplingResult.recordAndSample();
   }
 
   @Override

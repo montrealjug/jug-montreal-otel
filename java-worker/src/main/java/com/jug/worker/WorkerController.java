@@ -2,7 +2,6 @@ package com.jug.worker;
 
 import java.util.Random;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,7 +67,7 @@ public class WorkerController {
   @GetMapping("/person/id/{id}")
   public ResponseEntity<Person> getPerson(@PathVariable long id) {
     // TOSHOW: otel meter counter
-    otelMeter.counterBuilder("get_request_total").build().add(1L, Attributes.of(AttributeKey.stringKey("id"), String.valueOf(id))); 
+    otelMeter.counterBuilder("jug_get_requests_total").build().add(1L, Attributes.of(AttributeKey.stringKey("id"), String.valueOf(id))); 
     //meterRegistry.counter("get_request_total").increment();
 
     Span span = tracer.spanBuilder("getPerson").startSpan();
