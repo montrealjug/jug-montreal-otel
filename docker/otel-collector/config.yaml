@@ -4,22 +4,33 @@ receivers:
       grpc:
       http:
 
-  zipkin:
-
 processors:
   batch:
 
 exporters:
   logging:
     loglevel: debug
+  otlp:
+    endpoint: "promscale:9202"
+    tls:
+      insecure: true
+    sending_queue:
+      queue_size: 1000000
+    timeout: 10s
+  prometheusremotewrite:
+    endpoint: "http://promscale:9201/write"
+    resource_to_telemetry_conversion:
+      enabled: true # Convert resource attributes to metric labels
+    tls:
+      insecure: true
 
 service:
   pipelines:
     traces:
-      receivers: [otlp,zipkin]
+      receivers: [otlp]
       processors: [batch]
-      exporters: [logging]
+      exporters: [logging,otlp]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging]
+      exporters: [logging,prometheusremotewrite]

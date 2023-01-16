@@ -1,5 +1,32 @@
 version: "3"
 services:
+
+  timescaledb:
+    image: timescale/timescaledb-ha:pg14-latest
+    ports:
+      - 5432:5432/tcp
+    volumes:
+      - timescaledb-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tsdb
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - promscale
+
+  promscale:
+    image: timescale/promscale:latest
+    ports:
+      - 9201:9201/tcp
+      - 9202:9202/tcp
+    depends_on:
+      - timescaledb
+    environment:
+      PROMSCALE_DB_URI: postgres://postgres:password@timescaledb:5432/tsdb?sslmode=allow
+    networks:
+      - promscale
+
   otel-collector:
     image: otel/opentelemetry-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
@@ -8,4 +35,26 @@ services:
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP http receiver
-      - "9411:9411"   # Zipkin receiver
+    depends_on:
+      - promscale
+    networks:
+      - promscale
+
+  grafana:
+    image: grafana/grafana-oss
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - 3000:3000/tcp
+    depends_on:
+      - timescaledb
+    networks:
+      - promscale
+
+volumes:
+  timescaledb-data:
+  grafana-data:
+
+networks:
+  promscale:
+    driver: bridge
