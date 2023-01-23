@@ -11,7 +11,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.opentelemetry:opentelemetry-api:1.21.0'
+    implementation 'io.opentelemetry:opentelemetry-sdk:1.21.0'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.21.0'
 }
 
 application {
@@ -19,9 +20,9 @@ application {
 }
 
 run {
-    jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
-    environment OTEL_SERVICE_NAME: "java-main"
-    environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
+    //jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
+    //environment OTEL_SERVICE_NAME: "java-main"
+    //environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
 }
 
 tasks.named('test') {

@@ -48,16 +48,27 @@ dependencies {
 }
 
 bootRun {
-    //jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
+    jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
 	
 	// agent extension configuration
 	//environment OTEL_JAVAAGENT_EXTENSIONS: "../otelagent-extensions/build/libs/otelagent-extensions-0.0.1-SNAPSHOT.jar"
-    jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
+    //jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
 
 	environment OTEL_SERVICE_NAME: "java-worker"
 	// default value
 	environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
-	environment OTEL_INSTRUMENTATION_SPRING_DATA_ENABLED: "false"
+	
+	// control instrumentation libraries
+	//environment OTEL_INSTRUMENTATION_COMMON_DEFAULT_ENABLED: "false"
+	//environment OTEL_INSTRUMENTATION_TOMCAT_ENABLED: "true"
+	//environment OTEL_INSTRUMENTATION_SPRING_WEBMVC_ENABLED: "true"
+	//environment OTEL_INSTRUMENTATION_OPENTELEMETRY_INSTRUMENTATIONS_ANNOTATIONS_ENBLED: "true"
+	//environment OTEL_INSTRUMENTATION_JDBC_ENABLED: "true"
+	//environment OTEL_INSTRUMENTATION_MICROMETER_ENABLED: "true"
+	
+	// disable automatic resource providers (os, host, process, ...)
+	environment OTEL_JAVA_ENABLED_RESOURCE_PROVIDERS: "none"
+	//environment OTEL_JAVA_DISABLED_RESOURCE_PROVIDERS: "io.opentelemetry.instrumentation.resources.ProcessResourceProvider,io.opentelemetry.instrumentation.resources.OsResourceProvider"
 }
 
 tasks.named('test') {

@@ -51,6 +51,21 @@ services:
     networks:
       - promscale
 
+  jaegger-query:
+    image: jaegertracing/jaeger-query:1.41
+    ports:
+      - 16685:16685/tcp
+      - 16686:16686/tcp
+      - 16687:16687/tcp
+    environment:
+      SPAN_STORAGE_TYPE: grpc-plugin
+      GRPC_STORAGE_SERVER: promscale:9202
+    depends_on:
+      - timescaledb
+    networks:
+      - promscale  
+ 
+
 volumes:
   timescaledb-data:
   grafana-data:

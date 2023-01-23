@@ -10,13 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.metrics.Meter;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
 import io.opentelemetry.instrumentation.annotations.SpanAttribute;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 
@@ -26,11 +19,9 @@ public class WorkerController {
   private static final int FAIL_RATE_PERCENT = 3;
 
   private final Random random = new Random();
-  private final Tracer tracer =
-        GlobalOpenTelemetry.getTracer("java-worker", "0.0.1");
-  private final Meter otelMeter =
-        GlobalOpenTelemetry.getMeter("java-worker");
   private final PersonRepository repository;
+  
+  // micrometer registry
   private final MeterRegistry meterRegistry;
 
   public WorkerController(PersonRepository repository, MeterRegistry meterRegistry) {
@@ -46,7 +37,7 @@ public class WorkerController {
   @PostMapping("/person/{firstName}")
   public ResponseEntity<Person> createPerson(@PathVariable String firstName) {
     // TOSHOW: micrometer counter
-    meterRegistry.counter("create_request_total").increment();
+    meterRegistry.counter("jug_create_request_total").increment();
     
     if (!randomlyFail(firstName)) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -66,19 +57,12 @@ public class WorkerController {
    */
   @GetMapping("/person/id/{id}")
   public ResponseEntity<Person> getPerson(@PathVariable long id) {
-    // TOSHOW: otel meter counter
-    otelMeter.counterBuilder("jug_get_requests_total").build().add(1L, Attributes.of(AttributeKey.stringKey("id"), String.valueOf(id))); 
-    //meterRegistry.counter("get_request_total").increment();
-
-    Span span = tracer.spanBuilder("getPerson").startSpan();
-    try (Scope ss = span.makeCurrent()) {
-      return repository.findById(id)
+    // TOSHOW: micrometer counter
+    meterRegistry.counter("jug_get_requests_total").increment();
+    
+    return repository.findById(id)
         .map(res -> ResponseEntity.ok(res))
         .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    } finally {
-        span.end();
-    }
-    
   }
 
   /**

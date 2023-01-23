@@ -10,7 +10,6 @@ public class ScheduledTasks {
 
   private static final Logger LOGGER = Logger.getLogger(ScheduledTasks.class.getName());
   private final PersonRepository personRepository;
-  
 
   public ScheduledTasks(PersonRepository personRepository) {
     this.personRepository = personRepository;
