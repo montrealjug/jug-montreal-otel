@@ -12,6 +12,11 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: tsdb
       POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+        test: ls /var/run/postgresql/.s.PGSQL.5432 && sleep 5 || exit 1
+        interval: 1s
+        timeout: 10s
+        retries: 20
     networks:
       - promscale
 
@@ -21,7 +26,8 @@ services:
       - 9201:9201/tcp
       - 9202:9202/tcp
     depends_on:
-      - timescaledb
+      timescaledb:
+          condition: service_healthy
     environment:
       PROMSCALE_DB_URI: postgres://postgres:password@timescaledb:5432/tsdb?sslmode=allow
     networks:
@@ -52,16 +58,19 @@ services:
       - promscale
 
   jaegger-query:
-    image: jaegertracing/jaeger-query:1.41
+    image: jaegertracing/all-in-one:latest
     ports:
       - 16685:16685/tcp
       - 16686:16686/tcp
       - 16687:16687/tcp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 14268:14268
     environment:
       SPAN_STORAGE_TYPE: grpc-plugin
       GRPC_STORAGE_SERVER: promscale:9202
     depends_on:
-      - timescaledb
+      - promscale
     networks:
       - promscale  
  
