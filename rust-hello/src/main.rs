@@ -1,34 +1,49 @@
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, App, HttpRequest, HttpServer};
 use actix_web_opentelemetry::RequestTracing;
-use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
-use std::io;
-use tracing_subscriber::prelude::*;
-use tracing_subscriber::Registry;
+use opentelemetry::global::shutdown_tracer_provider;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::sdk::Resource;
+use opentelemetry::{global, KeyValue};
+use opentelemetry::{
+    trace::{FutureExt, TraceContextExt, Tracer},
+    Key,
+};
+use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 
-async fn index(username: actix_web::web::Path<String>) -> String {
+use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
+use tracing_subscriber::{EnvFilter, Registry};
+
+async fn index(username: actix_web::web::Path<String>, req: HttpRequest) -> String {
+    for i in req.headers().iter() {
+        println!("header = {:?}", i);
+    }
     greet_user(username.as_ref())
 }
 
 #[tracing::instrument]
-fn greet_user(id: &str) -> String {
+fn greet_user(username: &str) -> String {
     tracing::info!("preparing to greet user");
-    format!("Hello id = {}", id)
+    format!("Hello {}", username)
 }
 
 #[actix_web::main]
-async fn main() -> io::Result<()> {
+async fn main() -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", "debug");
+    env_logger::init();
     global::set_text_map_propagator(TraceContextPropagator::new());
-    let tracer = opentelemetry_jaeger::new_pipeline()
-        .with_service_name("jug-rust-hello")
+    let exporter = opentelemetry_otlp::new_exporter().tonic();
+    opentelemetry_otlp::new_pipeline()
+        .tracing()
+        .with_trace_config(
+            opentelemetry::sdk::trace::config().with_resource(Resource::new(vec![KeyValue::new(
+                opentelemetry_semantic_conventions::resource::SERVICE_NAME,
+                "jug-rust-service",
+            )])),
+        )
+        .with_exporter(exporter)
         .install_simple()
-        .unwrap();
-
-    Registry::default()
-        .with(tracing_subscriber::EnvFilter::new("INFO"))
-        .with(tracing_subscriber::fmt::layer())
-        .with(tracing_opentelemetry::layer().with_tracer(tracer))
-        .init();
+        .expect("could not init the tracer");
 
     HttpServer::new(move || {
         App::new()
@@ -36,7 +51,12 @@ async fn main() -> io::Result<()> {
             .wrap(RequestTracing::new())
             .service(web::resource("/person/id/{id}").to(index))
     })
-    .bind("0.0.0.0:8081")?
+    .bind("0.0.0.0:8081")
+    .unwrap()
     .run()
-    .await
+    .await?;
+
+    shutdown_tracer_provider();
+
+    Ok(())
 }
