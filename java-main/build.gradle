@@ -19,13 +19,12 @@ application {
     mainClass = 'com.jug.App'
 }
 
-run {
-    //jvmArgs = ["-javaagent:../otelagent-extensions/build/libs/opentelemetry-javaagent.jar"]
-    //environment OTEL_SERVICE_NAME: "java-main"
-    //environment OTEL_EXPORTER_OTLP_ENDPOINT: "http://localhost:4317"
+task runRust {
+    doFirst {
+        run.configure {
+            // call rust_hello (instead of java-worker) for GetPersonJob
+            environment USE_RUST: "true" 
+        }
+    }
 }
-
-tasks.named('test') {
-    useJUnitPlatform() 
-}
-
+runRust.finalizedBy run

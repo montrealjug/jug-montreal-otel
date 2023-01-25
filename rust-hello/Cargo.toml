@@ -1,0 +1,15 @@
+[package]
+name = "jug-rust-hello"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+opentelemetry = { version = "0.18.0" }
+opentelemetry-otlp = "0.11.0"
+actix-web = "4.1"
+actix-web-opentelemetry = "0.13"
+env_logger = "0.10.0"
+opentelemetry-semantic-conventions = "0.10.0"
+tracing = "0.1.37"
+

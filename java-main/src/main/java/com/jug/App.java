@@ -53,7 +53,7 @@ public class App {
     private static final Logger LOGGER = Logger.getLogger("App");
     private static final String CREATE_PERSON_ENDPOINT = "http://localhost:8080/person/";
     private static final String GET_PERSON_BY_ID_ENDPOINT = "http://localhost:8080/person/id/";
-
+    private static final String GET_PERSON_BY_ID_ENDPOINT_RUST = "http://localhost:8081/person/id/";
     // p = already in database, with rate = 1/sec and size = 1000
     // after 5min, p=30%
     private static final int NAMES_LIST_SIZE = 1000;
@@ -142,7 +142,6 @@ public class App {
      * Return a random name from the list within a dedicated span
      */
     private String localNameGenerator() {
-        // TODO@Maxime: remote call to a rust app with a manual propagation of the context (traceid)
         Span span = tracer.spanBuilder("localNameGenerator").setSpanKind(SpanKind.INTERNAL).startSpan();
         try (Scope ss = span.makeCurrent()) {
             int randomValue = random.nextInt(names.size());
@@ -251,6 +250,7 @@ public class App {
 
         @Override
         public void run() {
+            String endpoint = (null != System.getenv("USE_RUST")) ? GET_PERSON_BY_ID_ENDPOINT_RUST : GET_PERSON_BY_ID_ENDPOINT; 
             SpanBuilder builder = tracer.spanBuilder("getPerson").setSpanKind(SpanKind.CLIENT);
             if (spanContext != null) {
                 // TOSHOW: link with the main span
@@ -267,7 +267,7 @@ public class App {
                 }
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                    .uri(URI.create(GET_PERSON_BY_ID_ENDPOINT + param));
+                    .uri(URI.create(endpoint + param));
 
                 HttpResponse<String> response = client.send(addContextToHttpRequest(requestBuilder).build(), HttpResponse.BodyHandlers.ofString());
                 LOGGER.log(Level.INFO, "Response: {0}:{1}", new String[]{String.valueOf(response.statusCode()), response.body()});
