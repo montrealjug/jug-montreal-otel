@@ -142,7 +142,6 @@ public class App {
      * Return a random name from the list within a dedicated span
      */
     private String localNameGenerator() {
-        // TODO@Maxime: remote call to a rust app with a manual propagation of the context (traceid)
         Span span = tracer.spanBuilder("localNameGenerator").setSpanKind(SpanKind.INTERNAL).startSpan();
         try (Scope ss = span.makeCurrent()) {
             int randomValue = random.nextInt(names.size());
