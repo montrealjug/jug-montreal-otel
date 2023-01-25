@@ -58,14 +58,11 @@ services:
       - promscale
 
   jaegger-query:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/jaeger-query:1.41
     ports:
       - 16685:16685/tcp
       - 16686:16686/tcp
       - 16687:16687/tcp
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 14268:14268
     environment:
       SPAN_STORAGE_TYPE: grpc-plugin
       GRPC_STORAGE_SERVER: promscale:9202
