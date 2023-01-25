@@ -37,6 +37,8 @@ dependencies {
 }
 
 task extendedAgent(type: Jar) {
+  group 'build'
+  description 'build agent with extension'
   dependsOn(configurations.otel)
   archiveFileName = "opentelemetry-javaagent.jar"
   from zipTree(configurations.otel.singleFile)

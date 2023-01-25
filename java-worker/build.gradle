@@ -20,35 +20,24 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
   	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	//implementation 'org.springframework.boot:spring-boot-starter-task'
     
 	// micrometer
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	
-	// opentelemetry bridge
-	//implementation 'io.micrometer:micrometer-tracing-bridge-otel'
-	//implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
 
 	// opentelemetry API + annotation
 	implementation 'io.opentelemetry:opentelemetry-api:1.20.1'
 	implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations:1.21.0'
 
-	// opentelemetry SDK
-    //implementation 'io.opentelemetry:opentelemetry-sdk:1.20.1'
-    //implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.20.1'
-
 	// opentelemtry autoconfigured
 	//implementation 'io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.21.0-alpha'
 
   	runtimeOnly 'com.h2database:h2'
-	
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	otelagent 'io.opentelemetry.javaagent:opentelemetry-javaagent:1.21.0'
 }
 
 bootRun {
-    jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
+	jvmArgs = ["-javaagent:" + configurations.otelagent.singleFile.absolutePath]
 	
 	// agent extension configuration
 	//environment OTEL_JAVAAGENT_EXTENSIONS: "../otelagent-extensions/build/libs/otelagent-extensions-0.0.1-SNAPSHOT.jar"
@@ -67,10 +56,7 @@ bootRun {
 	//environment OTEL_INSTRUMENTATION_MICROMETER_ENABLED: "true"
 	
 	// disable automatic resource providers (os, host, process, ...)
+	// "none" is not an official value. but as it is unrecognized, it removes all providers
 	environment OTEL_JAVA_ENABLED_RESOURCE_PROVIDERS: "none"
 	//environment OTEL_JAVA_DISABLED_RESOURCE_PROVIDERS: "io.opentelemetry.instrumentation.resources.ProcessResourceProvider,io.opentelemetry.instrumentation.resources.OsResourceProvider"
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
 }

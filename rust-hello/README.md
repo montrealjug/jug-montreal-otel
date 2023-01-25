@@ -4,4 +4,4 @@ Inspired from: https://github.com/open-telemetry/opentelemetry-rust/tree/main/ex
 
 `cargo run --release` will compile and start the API on `8081`
 
-Run java-main project with `USE_RUST=true` to use this endpoint
+Run java-main project with `runRust` to use this endpoint

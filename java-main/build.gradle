@@ -22,7 +22,7 @@ application {
 task runRust {
     doFirst {
         run.configure {
-            // call rust_hello (instead of java-worker) for GetPersonJob
+            // call rust-hello (instead of java-worker) for GetPersonJob
             environment USE_RUST: "true" 
         }
     }

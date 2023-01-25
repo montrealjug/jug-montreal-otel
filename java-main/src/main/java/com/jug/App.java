@@ -124,10 +124,10 @@ public class App {
         Span span = tracer.spanBuilder("createPerson").startSpan();
         try (Scope ss = span.makeCurrent()) {
             // Generator
-            String firstname = localNameGenerator();
+            String firstName = localNameGenerator();
 
             // Call API
-            doCreateCall(firstname);
+            doCreateCall(firstName);
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Got error: {0}:{1}", 
                 new String[]{ex.getClass().getName(), ex.getMessage()});
@@ -142,11 +142,11 @@ public class App {
      * Return a random name from the list within a dedicated span
      */
     private String localNameGenerator() {
+        meter.counterBuilder("jug_name_generator_triggered").build().add(1L);
         Span span = tracer.spanBuilder("localNameGenerator").setSpanKind(SpanKind.INTERNAL).startSpan();
         try (Scope ss = span.makeCurrent()) {
             int randomValue = random.nextInt(names.size());
             String name = names.get(randomValue);
-            meter.counterBuilder("jug_name_generator_triggered").build().add(1L);
             return name;
         } finally {
             span.end();
