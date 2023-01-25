@@ -21,7 +21,6 @@ fn greet_user(username: &str) -> String {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
     global::set_text_map_propagator(TraceContextPropagator::new());
     let exporter = opentelemetry_otlp::new_exporter().tonic();
