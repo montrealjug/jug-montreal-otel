@@ -5,14 +5,6 @@ use opentelemetry::global::shutdown_tracer_provider;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
 use opentelemetry::sdk::Resource;
 use opentelemetry::{global, KeyValue};
-use opentelemetry::{
-    trace::{FutureExt, TraceContextExt, Tracer},
-    Key,
-};
-use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
-
-use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
-use tracing_subscriber::{EnvFilter, Registry};
 
 async fn index(username: actix_web::web::Path<String>, req: HttpRequest) -> String {
     for i in req.headers().iter() {
